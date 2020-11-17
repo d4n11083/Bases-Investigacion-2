@@ -32,7 +32,7 @@ def getDepartamentos():
             'nombreDepartamento': doc['nombreDepartamento']
         })
 
-    return jsonify(users)
+    return jsonify(departamentos)
 
 @app.route('/departamento/<id>', methods=['GET'])
 def getDepartamento(id):
