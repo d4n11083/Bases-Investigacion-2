@@ -13,54 +13,47 @@ CORS(app)
 db = mongo.db.departamentos
 
 
-@app.route('/users', methods=['POST'])
-def createUser():
+@app.route('/departamento', methods=['POST'])
+def createDepartamento():
     id = db.insert({
-        'name': request.json['name'],
-        'email': request.json['email'],
-        'password': request.json['password']
+        'nombreDepartamento': request.json['nombreDepartamento'],
+        'empleados' : []
     })
 
     return jsonify(str(ObjectId(id)))
 
-@app.route('/users', methods=['GET'])
-def getUsers():
-    users = []
+@app.route('/departamento', methods=['GET'])
+def getDepartamentos():
+    departamentos = []
 
     for doc in db.find():
-        users.append({
+        departamentos.append({
             '_id': str(ObjectId(doc['_id'])),
-            'name': doc['name'],
-            'email': doc['email'],
-            'password': doc['password']
+            'nombreDepartamento': doc['nombreDepartamento']
         })
 
     return jsonify(users)
 
-@app.route('/user/<id>', methods=['GET'])
-def getUser(id):
-    user = db.find_one({ '_id': ObjectId(id) })
-    print(user)
+@app.route('/departamento/<id>', methods=['GET'])
+def getDepartamento(id):
+    departamento = db.find_one({ '_id': ObjectId(id) })
+
     return jsonify({
-        '_id': str(ObjectId(user['_id'])),
-        'name': user['name'],
-        'email': user['email'],
-        'password': user['password']
+        '_id': str(ObjectId(departamento['_id'])),
+        'nombreDepartamento': departamento['name']
     })
 
-@app.route('/user/<id>', methods=['DELETE'])
-def deleteUser(id):
+@app.route('/departamento/<id>', methods=['DELETE'])
+def deleteDepartamento(id):
 
     db.delete_one({ '_id' : ObjectId(id) })
-    return {'msg': 'user Deleted'}
+    return {'msg': 'Departamento Eliminado'}
 
 
-@app.route('/user/<id>', methods=['PUT'])
-def updateUser(id):
+@app.route('/departamento/<id>', methods=['PUT'])
+def updateDepartamento(id):
     db.update_one( { '_id': ObjectId(id) }, {'$set':{
-        'name': request.json['name'],
-        'email': request.json['email'],
-        'password':request.json['password']
+        'nombreDepartamento': request.json['nombreDepartamento']
     }
     } )
 
