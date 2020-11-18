@@ -12,7 +12,17 @@ mongo = PyMongo(app)
 CORS(app)
 
 db = mongo.db.departamentos
+'''
+CREATE DEPARTAMENTOS
+Recibe:
 
+{ "nombreDepartamento" : "..." }
+
+Retorna:
+
+{ "str(ObjectId)" }
+
+'''
 
 @app.route('/departamento', methods=['POST'])
 def createDepartamento():
@@ -23,6 +33,28 @@ def createDepartamento():
 
     return jsonify(str(ObjectId(id)))
 
+'''
+GET DEPARTAMENTOS
+
+Recibe: 
+GET
+
+Retorna: 
+[
+    {
+        "_id": "...",
+        "nombreDepartamento" : "..."
+    },
+    {
+        "_id": "...",
+        "nombreDepartamento" : "..."
+    }
+    .
+    .
+    .
+]
+
+'''
 @app.route('/departamentos', methods=['GET'])
 def getDepartamentos():
     departamentos = []
@@ -35,6 +67,18 @@ def getDepartamentos():
 
     return jsonify(departamentos)
 
+'''
+GET DEPARTAMENTO
+Recibe: 
+{ "id": "..." }
+
+Retorna:
+{
+    "_id" : "...",
+    "nombreDepartamento" : "..."
+}
+
+'''
 @app.route('/departamento', methods=['GET'])
 def getDepartamento():
     id = request.json['id']
@@ -45,13 +89,31 @@ def getDepartamento():
         'nombreDepartamento': departamento['nombreDepartamento']
     })
 
+'''
+DELETE DEPARTAMENTO
+Recibe: 
+{ "id": "..." }
+
+Retorna:
+
+{'msg' : "Departamento Actualizado"}
+
+'''
 @app.route('/departamento', methods=['DELETE'])
 def deleteDepartamento():
     id = request.json['id']
     db.delete_one({ '_id' : ObjectId(id) })
     return {'msg': 'Departamento Eliminado'}
 
+'''
+UPDATE DEPARTAMENTO
 
+Recibe: 
+{ "id": "..." }
+
+Retorna:
+{'msg' : "Departamento Actualizado"}
+'''
 @app.route('/departamento', methods=['PUT'])
 def updateDepartamento():
     id = request.json['id']
@@ -63,7 +125,20 @@ def updateDepartamento():
 
 #Crud Empleados
 
+'''
+CREATE EMPLEADO
+Recibe: 
+{
+    "nombreDepartamento" : "...",
+    "idEmpleado" : "...",
+    "nombreEmpleado": "...",
+    "apellidoEmpleado": "...",
+    "fechaIngresoEmpleado": "..."
+}
 
+Retorna:
+{ str(idEmpelado) }
+'''
 @app.route('/empleado', methods=['POST'])
 def createEmpleado():
 
@@ -81,6 +156,59 @@ def createEmpleado():
     }}} )
     return jsonify(request.json['idEmpleado'])
 
+
+'''
+GET EMPLEADOS
+
+Recibe: 
+GET
+
+Retorna:
+{
+    [
+        {
+            "departamento" : "...",
+            "empleados" : [
+                {
+                 "nombreDepartamento" : "...",
+                 "idEmpleado" : "...",
+                 "nombreEmpleado": "...",
+                 "apellidoEmpleado": "...",
+                 "fechaIngresoEmpleado": "..."
+                },
+                {
+                 "nombreDepartamento" : "...",
+                 "idEmpleado" : "...",
+                 "nombreEmpleado": "...",
+                 "apellidoEmpleado": "...",
+                 "fechaIngresoEmpleado": "..."
+                },
+            ]
+        },
+
+        {
+            "departamento" : "...",
+            "empleados" : [
+                {
+                 "nombreDepartamento" : "...",
+                 "idEmpleado" : "...",
+                 "nombreEmpleado": "...",
+                 "apellidoEmpleado": "...",
+                 "fechaIngresoEmpleado": "..."
+                },
+                {
+                 "nombreDepartamento" : "...",
+                 "idEmpleado" : "...",
+                 "nombreEmpleado": "...",
+                 "apellidoEmpleado": "...",
+                 "fechaIngresoEmpleado": "..."
+                },
+            ]
+        },
+
+    ]
+}
+'''
 @app.route('/empleados', methods=['GET'])
 def getEmpleados():
     empleados = []
@@ -93,6 +221,20 @@ def getEmpleados():
 
     return jsonify(empleados)
 
+'''
+UPDATE EMPLEADO
+
+Recibe: 
+{
+    "nombreDepartamento" : "...",
+    "idEmpleado" : "...",
+    "nuevoNombre": "...",
+    "nuevoApellido": "...",
+}
+
+Retorna:
+{"msg" : "Empleado Actualizado"}
+'''
 @app.route('/empleado', methods = ['PUT'])
 def updateEmpleado():
     idEmpleado = request.json['idEmpleado']
@@ -110,7 +252,18 @@ def updateEmpleado():
     return {"msg" : "Empleado Actualizado"}
 
 
+'''
+DELETE EMPLEADO
 
+Recibe: 
+{
+    "nombreDepartamento" : "...",
+    "idEmpleado" : "...",
+}
+
+Retorna:
+{"msg" : "Empleado Eliminado"}
+'''
 @app.route('/empleado', methods = ['DELETE'])
 def deleteEmpleado():
     idEmpleado = request.json['idEmpleado']
