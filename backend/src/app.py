@@ -60,6 +60,7 @@ def updateDepartamento():
     }})
     return {'msg' : "Departamento Actualizado"}
 
+
 #Crud Empleados
 
 
@@ -86,22 +87,44 @@ def getEmpleados():
 
     for doc in db.find():
         empleados.append({
-            doc['nombreDepartamento']: doc['empleados'] 
+            "departamento" : doc['nombreDepartamento'],
+            "empleados" : doc['empleados'] 
         })
 
     return jsonify(empleados)
 
 @app.route('/empleado', methods = ['PUT'])
 def updateEmpleado():
-    departamento = request.json['nombreDepartamento']
     idEmpleado = request.json['idEmpleado']
 
-    return "hola"
+    try:
+        Departamento = db.find_one({ "nombreDepartamento": request.json["nombreDepartamento"] })['_id']
+    except Exception as e:
+        return {"Error" : str(e)}
+
+    db.update_one( {"nombreDepartamento": request.json["nombreDepartamento"], "empleados.idEmpleado":idEmpleado }, { "$set": 
+    { "empleados.$.nombreEmpleado":request.json['nuevoNombre'],
+     "empleados.$.apellidoEmpleado":request.json['nuevoApellido']  
+     }  }  )
+
+    return {"msg" : "Empleado Actualizado"}
+
+
 
 @app.route('/empleado', methods = ['DELETE'])
 def deleteEmpleado():
-    return "hola"
+    idEmpleado = request.json['idEmpleado']
 
+    try:
+        Departamento = db.find_one({ "nombreDepartamento": request.json["nombreDepartamento"] })['_id']
+    except Exception as e:
+        return {"Error" : str(e)}
+
+    db.update_one( {"_id": ObjectId(Departamento)}, {"$pull": {"empleados" : {
+        "idEmpleado" : idEmpleado
+    }}} )
+
+    return {"msg" : "Empleado Eliminado"} 
 
 if __name__ == "__main__":
     app.run(debug=True)
