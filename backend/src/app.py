@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_pymongo import PyMongo, ObjectId
+from pymongo import errors
 from flask_cors import CORS
 
 
@@ -22,7 +23,7 @@ def createDepartamento():
 
     return jsonify(str(ObjectId(id)))
 
-@app.route('/departamento', methods=['GET'])
+@app.route('/departamentos', methods=['GET'])
 def getDepartamentos():
     departamentos = []
 
@@ -34,30 +35,73 @@ def getDepartamentos():
 
     return jsonify(departamentos)
 
-@app.route('/departamento/<id>', methods=['GET'])
-def getDepartamento(id):
+@app.route('/departamento', methods=['GET'])
+def getDepartamento():
+    id = request.json['id']
     departamento = db.find_one({ '_id': ObjectId(id) })
 
     return jsonify({
         '_id': str(ObjectId(departamento['_id'])),
-        'nombreDepartamento': departamento['name']
+        'nombreDepartamento': departamento['nombreDepartamento']
     })
 
-@app.route('/departamento/<id>', methods=['DELETE'])
-def deleteDepartamento(id):
-
+@app.route('/departamento', methods=['DELETE'])
+def deleteDepartamento():
+    id = request.json['id']
     db.delete_one({ '_id' : ObjectId(id) })
     return {'msg': 'Departamento Eliminado'}
 
 
-@app.route('/departamento/<id>', methods=['PUT'])
-def updateDepartamento(id):
+@app.route('/departamento', methods=['PUT'])
+def updateDepartamento():
+    id = request.json['id']
     db.update_one( { '_id': ObjectId(id) }, {'$set':{
         'nombreDepartamento': request.json['nombreDepartamento']
-    }
-    } )
+    }})
+    return {'msg' : "Departamento Actualizado"}
 
-    return {'msg' : "user Updated"}
+#Crud Empleados
+
+
+@app.route('/empleado', methods=['POST'])
+def createEmpleado():
+
+    try:
+        Departamento = db.find_one({ "nombreDepartamento": request.json["nombreDepartamento"] })['_id']
+    except Exception as e:
+        return {"Error" : str(e)}
+    
+
+    db.update_one( {"_id": ObjectId(Departamento)}, {"$push": {"empleados" : {
+        "idEmpleado" : request.json['idEmpleado'],
+        "nombreEmpleado" : request.json['nombreEmpleado'],
+        "apellidoEmpleado" : request.json['apellidoEmpleado'],
+        "fechaIngresoEmpleado" : request.json['fechaIngresoEmpleado'] 
+    }}} )
+    return jsonify(request.json['idEmpleado'])
+
+@app.route('/empleados', methods=['GET'])
+def getEmpleados():
+    empleados = []
+
+    for doc in db.find():
+        empleados.append({
+            doc['nombreDepartamento']: doc['empleados'] 
+        })
+
+    return jsonify(empleados)
+
+@app.route('/empleado', methods = ['PUT'])
+def updateEmpleado():
+    departamento = request.json['nombreDepartamento']
+    idEmpleado = request.json['idEmpleado']
+
+    return "hola"
+
+@app.route('/empleado', methods = ['DELETE'])
+def deleteEmpleado():
+    return "hola"
+
 
 if __name__ == "__main__":
     app.run(debug=True)
